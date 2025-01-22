@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  title: User and Medication API
+  description: API for managing users and their medications
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/
+    description: Local server
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        userType:
+          type: string
+          enum: [User, Pharmacist]
+    Medication:
+      type: object
+      properties:
+        name:
+          type: string
+        dosage:
+          type: string
+        started_at:
+          type: string
+          format: date
+        note:
+          type: string
+security:
+  - BearerAuth: []
+paths:
+  /users/{userId}:
+    get:
+      summary: Get user's medications
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of medications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Medication'
+    post:
+      summary: Add a medication to user's list
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Medication'
+      responses:
+        '201':
+          description: Medication added
+  /users/{userId}/medications/{medicationId}:
+    patch:
+      summary: Update a medication in user's list
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: medicationId
+          in: path
+          required: true
+          schema:
+              type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Medication'
+      responses:
+        '200':
+          description: Medication updated
+    delete:
+      summary: Delete a medication from user's list
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: medicationId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Medication deleted

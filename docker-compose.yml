@@ -1,0 +1,65 @@
+services:
+  php:
+    build: 
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    container_name: php
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - api
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - php
+    networks:
+      - api
+
+  mysql:
+    image: mysql
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123456
+    ports:
+        - "3306:3306"
+    volumes:
+      - ./docker/mysql:/docker-entrypoint-initdb.d
+      - mysql-data:/var/lib/mysql
+    networks:
+      - api
+
+  swagger:
+    image: swaggerapi/swagger-ui
+    container_name: swagger
+    environment:
+      SWAGGER_JSON: /swagger.yml
+    volumes:
+      - ./swagger.yml:/swagger.yml
+    ports:
+      - "8081:8080"
+    networks:
+      - api
+
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   networks:
+  #     - app-network
+
+networks:
+  api:
+    driver: bridge
+
+volumes:
+  mysql-data:

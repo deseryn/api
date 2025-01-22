@@ -1,0 +1,7 @@
+/vendor/
+/reports/
+/composer.lock
+.idea
+.phpunit.result.cache
+.php_cs.cache
+/.vscode
